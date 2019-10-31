@@ -24,7 +24,7 @@ public struct ToolbarItem {
         case systemItem(UIBarButtonItem.SystemItem)
         #endif
         
-        #if os(macOS)
+        #if os(macOS) || targetEnvironment(macCatalyst)
         case view(AnyView)
         case cocoaImage(NSImage)
         case cocoaView(NSView)
@@ -111,7 +111,7 @@ extension ToolbarItem {
         var result = NSToolbarItem(itemIdentifier: .init(rawValue: itemIdentifier))
         
         switch content {
-            #if os(macOS)
+            #if os(macOS) || targetEnvironment(macCatalyst)
             case let .view(view):
                 result.view = NSHostingView(rootView: view)
             case let .cocoaImage(image):
