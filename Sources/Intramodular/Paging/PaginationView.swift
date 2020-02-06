@@ -24,13 +24,7 @@ public struct PaginationView<Page: View>: View {
     ) {
         self.children = pages.map(_UIHostingController.init)
         self.axis = axis
-        
-        switch axis {
-            case .horizontal:
-                self.pageIndicatorAlignment = .center
-            case .vertical:
-                self.pageIndicatorAlignment = .leading
-        }
+        self.pageIndicatorAlignment = pageIndicatorAlignment ?? (axis == .horizontal ? .center : .leading)
     }
     
     public init(
@@ -45,6 +39,14 @@ public struct PaginationView<Page: View>: View {
         )
     }
     
+    private var pageControlPadding: Edge.Set {
+        switch pageIndicatorAlignment {
+        case .bottomLeading, .topLeading : return .leading
+        case .bottomTrailing, .topTrailing: return .trailing
+        default: return .init()
+        }
+    }
+    
     public var body: some View {
         ZStack(alignment: pageIndicatorAlignment) {
             _PaginationView(
@@ -55,16 +57,14 @@ public struct PaginationView<Page: View>: View {
                 progressionController: $progressionController
             )
             
-            if axis == .vertical || pageIndicatorAlignment != .center {
-                PageControl(
-                    numberOfPages: children.count,
-                    currentPage: $currentPageIndex
-                ).rotationEffect(
-                    axis == .vertical
-                        ? .init(degrees: 90)
-                        : .init(degrees: 0)
-                )
-            }
+            PageControl(
+                numberOfPages: children.count,
+                currentPage: $currentPageIndex
+            ).rotationEffect(
+                axis == .vertical
+                    ? .init(degrees: 90)
+                    : .init(degrees: 0)
+            ).padding(pageControlPadding)
         }
         .environment(\.progressionController, progressionController)
     }
